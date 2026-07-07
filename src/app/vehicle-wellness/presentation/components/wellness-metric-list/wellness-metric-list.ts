@@ -14,33 +14,26 @@ import {TranslatePipe} from '@ngx-translate/core';
 })
 export class WellnessMetricList implements OnInit {
 
-  
   store = inject(MetricsStore);
   private route = inject(ActivatedRoute);
 
-  
   metrics = this.store.metrics;
 
   ngOnInit() {
-    
     this.route.queryParams.subscribe(params => {
       const vehicleId = params['vehicleId'];
 
       
 
       if (vehicleId) {
-        
-        this.store.loadMetricsByVehicleId(vehicleId); 
+        this.store.loadMetricsByVehicleId(vehicleId);
       } else {
-        
         this.store.loadAllMetrics();
       }
     });
   }
 
-  
   onMetricSelected(metric: WellnessMetric) {
     console.log('Métrica seleccionada:', metric);
-    
   }
 }

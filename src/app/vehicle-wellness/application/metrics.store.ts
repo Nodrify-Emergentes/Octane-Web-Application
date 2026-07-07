@@ -6,13 +6,10 @@ import { WellnessMetric } from '@app/vehicle-wellness/domain/model/wellness-metr
   providedIn: 'root'
 })
 export class MetricsStore {
-  
   private metricsSignal = signal<WellnessMetric[]>([]);
 
-  
   readonly metrics = computed(() => this.metricsSignal());
 
-  
   private wellnessMetricsApiService = inject(WellnessMetricApiService);
 
   loadAllMetrics(): void {
@@ -56,7 +53,6 @@ export class MetricsStore {
       });
   }
 
-
   createMetric(wellnessMetric: WellnessMetric): void {
     this.wellnessMetricsApiService.createWellnessMetric(wellnessMetric)
       .subscribe(newMetric => {
@@ -75,7 +71,6 @@ export class MetricsStore {
     });
   }
 
-  
   reset(): void {
     this.metricsSignal.set([]);
   }

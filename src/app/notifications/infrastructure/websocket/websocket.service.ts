@@ -13,7 +13,7 @@ export class WebSocketService {
   public isConnected = new BehaviorSubject<boolean>(false);
   private connectionAttempted = false;
   private activeSubscriptions = new Map<number, any>();
-  private pendingSubscriptions = new Set<number>(); 
+  private pendingSubscriptions = new Set<number>();
 
   constructor() {}
 
@@ -67,10 +67,8 @@ export class WebSocketService {
       return;
     }
 
-    // Marcar como pendiente
     this.pendingSubscriptions.add(vehicleId);
 
-    // Si no hay cliente, conectarse primero
     if (!this.client) {
       console.log('Cliente no existe, conectando...');
       this.connect();
@@ -87,17 +85,16 @@ export class WebSocketService {
       return;
     }
 
-    
+    console.log('⏳ Esperando conexión para vehicle:', vehicleId);
 
     const connectionSub = this.isConnected.subscribe(connected => {
       if (connected && this.client) {
         console.log('Conectado, suscribiendo a vehicle:', vehicleId);
         this.doSubscription(vehicleId);
-        connectionSub.unsubscribe(); 
+        connectionSub.unsubscribe();
       }
     });
 
-    
     setTimeout(() => {
       connectionSub.unsubscribe();
       this.pendingSubscriptions.delete(vehicleId);
@@ -136,7 +133,6 @@ export class WebSocketService {
             data.severity
           );
 
-          // Agregar a la lista
           const current = this.notifications.value;
           this.notifications.next([notification, ...current]);
 
@@ -175,7 +171,7 @@ export class WebSocketService {
         const iconUrl = '/assets/icons/alert.png';
         new Notification(notification.title, {
           body: notification.message,
-          icon: iconUrl
+         // icon: iconUrl//
         }).onerror = () => {
           
           new Notification(notification.title, {
@@ -205,7 +201,6 @@ export class WebSocketService {
       this.client = null;
       this.isConnected.next(false);
 
-      
       this.activeSubscriptions.forEach((sub, vehicleId) => {
         sub.unsubscribe();
       });
@@ -216,7 +211,6 @@ export class WebSocketService {
     }
   }
 
-  
   getSubscriptionStatus() {
     return {
       activeSubscriptions: Array.from(this.activeSubscriptions.keys()),

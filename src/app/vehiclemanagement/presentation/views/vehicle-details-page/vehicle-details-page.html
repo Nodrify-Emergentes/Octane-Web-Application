@@ -20,9 +20,9 @@
         <h3>{{ 'vehicle.details.technicalSpecs' | translate }}</h3>
 
         <div class="actions-group">
-          <button class="btn-action primary" (click)="navigateToMetrics()">
+         <!-- <button class="btn-action primary" (click)="navigateToMetrics()">
             {{ 'vehicle.details.metrics' | translate }}
-          </button>
+          </button> -->
           <button class="btn-action secondary" (click)="navigateToCompare()">
             {{ 'vehicle.details.compare' | translate }}
           </button>
@@ -69,6 +69,27 @@
           <span class="spec-label">{{ 'vehicle.details.connectivity' | translate }}</span>
           <span class="spec-value">{{ vehicle?.model?.connectivity || '-' }}</span>
         </div>
+      </div>
+    </div>
+    <div class="wellness-card" *ngIf="wellnessSummary">
+      <div class="wellness-header">
+        <div class="wellness-icon">
+          🩺
+        </div>
+
+        <div class="wellness-title-group">
+          <h3>{{ 'vehicle.details.wellnessSummary' | translate }}</h3>
+          <span class="wellness-status"
+                [class.good]="wellnessSummary.status === 'GOOD'"
+                [class.warning]="wellnessSummary.status === 'WARNING'"
+                [class.critical]="wellnessSummary.status === 'CRITICAL'">
+        {{ wellnessSummary.status }}
+      </span>
+        </div>
+      </div>
+
+      <div class="wellness-body">
+        {{ wellnessSummary.summary }}
       </div>
     </div>
   </div>

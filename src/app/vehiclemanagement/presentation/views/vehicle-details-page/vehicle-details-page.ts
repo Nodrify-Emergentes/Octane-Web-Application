@@ -8,6 +8,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { AuthenticationService } from '@app/iam/services/authentication.service';
 import {TranslatePipe} from '@ngx-translate/core';
+import {WellnessSummaryApiService} from '@app/vehicle-wellness/infrastructure/wellness-summary-api.service';
+import {WellnessSummary} from '@app/vehicle-wellness/domain/model/wellness-summary.entity';
 
 @Component({
   selector: 'app-vehicle-details-page',
@@ -25,6 +27,8 @@ export class VehicleDetailsPage implements OnInit {
   vehicle: Vehicle | null = null;
   loading: boolean = true;
 
+  wellnessSummaryService = inject(WellnessSummaryApiService)
+  wellnessSummary?: WellnessSummary;
 
   constructor(
     private route: ActivatedRoute,
@@ -39,8 +43,22 @@ export class VehicleDetailsPage implements OnInit {
       this.vehicleId = params['vehicleId'] ? +params['vehicleId'] : null;
       if (this.vehicleId) {
         this.loadVehicle();
+        this.loadWellnessSummary();
       } else {
         this.loading = false;
+      }
+    })
+  }
+
+  private loadWellnessSummary(){
+    if (!this.vehicleId) return;
+
+    this.wellnessSummaryService.getLastSummaryFromVehicle(this.vehicleId).subscribe({
+      next: value => {
+        this.wellnessSummary = value
+      },
+      error: err => {
+        console.log("Error al intentar obtener el summary: " + err)
       }
     })
   }
@@ -71,11 +89,13 @@ export class VehicleDetailsPage implements OnInit {
   }
 
   navigateToMetrics() {
-    if (this.vehicle?.id) {
-      this.router.navigate(['/wellness-metrics'], {
-        queryParams: {vehicleId: this.vehicle.id}
-      });
-    }
+    // TODO: Uncomment when vehicle-wellness module is ready and route is enabled
+    // if (this.vehicle?.id) {
+    //   this.router.navigate(['/wellness-metrics'], {
+    //     queryParams: {vehicleId: this.vehicle.id}
+    //   });
+    // }
+    console.warn('⚠️ Wellness metrics feature is temporarily disabled. Awaiting full module implementation.');
   }
 
   navigateToCompare() {
