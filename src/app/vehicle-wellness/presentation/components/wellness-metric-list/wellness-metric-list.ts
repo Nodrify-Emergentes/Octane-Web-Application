@@ -23,7 +23,7 @@ export class WellnessMetricList implements OnInit {
     this.route.queryParams.subscribe(params => {
       const vehicleId = params['vehicleId'];
 
-      console.log('🚗 Vehicle ID from URL:', vehicleId);
+      
 
       if (vehicleId) {
         this.store.loadMetricsByVehicleId(vehicleId);

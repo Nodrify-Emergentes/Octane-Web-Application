@@ -21,7 +21,7 @@ export class WebSocketService {
     if (this.connectionAttempted) return;
     this.connectionAttempted = true;
 
-    console.log('🔄 Iniciando conexión WebSocket...');
+    console.log('Iniciando conexión WebSocket...');
 
     this.client = new Client({
       brokerURL: 'ws://localhost:8080/ws-wellness',
@@ -29,46 +29,48 @@ export class WebSocketService {
       connectionTimeout: 5000,
 
       onConnect: () => {
-        console.log('✅ WebSocket Conectado exitosamente');
+        
         this.isConnected.next(true);
+        
       },
 
       onDisconnect: () => {
-        console.log('❌ WebSocket Desconectado');
+        
         this.isConnected.next(false);
       },
 
       onStompError: (error) => {
-        console.error('❌ Error STOMP:', error);
+        
         this.isConnected.next(false);
       },
 
       onWebSocketError: (event) => {
-        console.error('🔌 Error WebSocket:', event);
+        
         this.isConnected.next(false);
       }
     });
 
     try {
       this.client.activate();
-      console.log('🎯 Cliente WebSocket activado');
+      console.log('Cliente WebSocket activado');
     } catch (error) {
-      console.error('❌ Error activando WebSocket:', error);
+      console.error('Error activando WebSocket:', error);
     }
   }
 
   subscribeToVehicle(vehicleId: number) {
-    console.log('📡 Intentando suscribirse a vehicle:', vehicleId);
+    console.log('Intentando suscribirse a vehicle:', vehicleId);
 
+    
     if (this.activeSubscriptions.has(vehicleId) || this.pendingSubscriptions.has(vehicleId)) {
-      console.log('ℹ️ Ya suscrito o pendiente de suscripción a vehicle:', vehicleId);
+      console.log('Ya suscrito o pendiente de suscripción a vehicle:', vehicleId);
       return;
     }
 
     this.pendingSubscriptions.add(vehicleId);
 
     if (!this.client) {
-      console.log('🔄 Cliente no existe, conectando...');
+      console.log('Cliente no existe, conectando...');
       this.connect();
     }
 
@@ -76,8 +78,9 @@ export class WebSocketService {
   }
 
   private setupSubscription(vehicleId: number) {
+    
     if (this.isConnected.value && this.client) {
-      console.log('✅ Ya conectado, suscribiendo inmediatamente');
+      console.log('Ya conectado, suscribiendo inmediatamente');
       this.doSubscription(vehicleId);
       return;
     }
@@ -86,7 +89,7 @@ export class WebSocketService {
 
     const connectionSub = this.isConnected.subscribe(connected => {
       if (connected && this.client) {
-        console.log('✅ Conectado, suscribiendo a vehicle:', vehicleId);
+        console.log('Conectado, suscribiendo a vehicle:', vehicleId);
         this.doSubscription(vehicleId);
         connectionSub.unsubscribe();
       }
@@ -100,23 +103,24 @@ export class WebSocketService {
 
   private doSubscription(vehicleId: number) {
     if (!this.client) {
-      console.error('❌ Cliente WebSocket no disponible');
+      console.error('Cliente WebSocket no disponible');
       this.pendingSubscriptions.delete(vehicleId);
       return;
     }
 
+    
     if (this.activeSubscriptions.has(vehicleId)) {
-      console.log('ℹ️ Ya existe suscripción activa para vehicle:', vehicleId);
+      console.log('Ya existe suscripción activa para vehicle:', vehicleId);
       this.pendingSubscriptions.delete(vehicleId);
       return;
     }
 
     const topic = `/topic/vehicle/${vehicleId}/alerts`;
-    console.log('🎯 Creando suscripción ÚNICA a:', topic);
+    console.log(' Creando suscripción ÚNICA a:', topic);
 
     try {
       const stompSubscription = this.client.subscribe(topic, (message) => {
-        console.log('🔔 Mensaje WebSocket recibido (SOLO UNA VEZ):', message.body);
+        console.log(' Mensaje WebSocket recibido (SOLO UNA VEZ):', message.body);
 
         try {
           const data = JSON.parse(message.body);
@@ -134,17 +138,18 @@ export class WebSocketService {
 
           this.showBrowserNotification(notification);
         } catch (error) {
-          console.error('❌ Error parseando mensaje:', error);
+          console.error('Error parseando mensaje:', error);
         }
       });
 
+      
       this.activeSubscriptions.set(vehicleId, stompSubscription);
       this.pendingSubscriptions.delete(vehicleId);
 
-      console.log(`✅ Suscrito EXITOSAMENTE a ${topic}`);
+      console.log(`Suscrito EXITOSAMENTE a ${topic}`);
 
     } catch (error) {
-      console.error('❌ Error en suscripción:', error);
+      console.error('Error en suscripción:', error);
       this.pendingSubscriptions.delete(vehicleId);
     }
   }
@@ -154,7 +159,7 @@ export class WebSocketService {
     if (subscription) {
       subscription.unsubscribe();
       this.activeSubscriptions.delete(vehicleId);
-      console.log('✅ Desuscrito de vehicle:', vehicleId);
+      console.log('Desuscrito de vehicle:', vehicleId);
     }
     this.pendingSubscriptions.delete(vehicleId);
   }
@@ -162,11 +167,13 @@ export class WebSocketService {
   private showBrowserNotification(notification: NotificationEntity) {
     if ('Notification' in window) {
       if (Notification.permission === 'granted') {
-        //const iconUrl = '/assets/icons/alert.png';//
+        
+        const iconUrl = '/assets/icons/alert.png';
         new Notification(notification.title, {
           body: notification.message,
          // icon: iconUrl//
         }).onerror = () => {
+          
           new Notification(notification.title, {
             body: notification.message
           });
@@ -200,7 +207,7 @@ export class WebSocketService {
       this.activeSubscriptions.clear();
       this.pendingSubscriptions.clear();
 
-      console.log('🔌 WebSocket desconectado y limpiado');
+      console.log('WebSocket desconectado y limpiado');
     }
   }
 
